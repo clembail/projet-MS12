@@ -1,0 +1,10 @@
+mesh Th = readmesh("GO_data/mesh.msh");
+
+plot(Th, wait=1, cmm="Maillage");
+
+fespace Vh(Th,P1);
+Vh uh;
+// ifstream fileUh("GO_data/uh.txt");
+// sfileUh >> uh[];
+
+// plot(uh, fill=1, value=1, wait=1, cmm="Re(u_total)");
