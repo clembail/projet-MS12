@@ -7,7 +7,7 @@ ifstream fileUh("./data/S.txt");
 fileUh >> S[];
 
 // Paramètres
-real k = 2*pi;
+real k = 4*pi;
 real a = 2.0;
 real R = 1;
 
@@ -36,7 +36,7 @@ plot(vh, value=true, wait=true, fill=true, nbiso=30, cmm="Champ total (partie re
 
 
 // PML
-real R0       = 1.5;
+real R0       = 1.75;
 real sigmaMax = 5.0;
 
 func real sigma(real r) {
@@ -75,4 +75,12 @@ problem HelmholtzPML(u, v)
     )
     - alpha * beta * u * v
   )
-  + /* IL MANQUE LES CONDITIONS AUX LIMITES ICI */ ;
+  + on(1, u=-exp(1i * k * x));
+
+HelmholtzPML;
+
+Vh2<complex> utot = u + exp(1i * k * x);
+Vh2 udiff = abs(u - vh)*(r <= R0);
+
+plot(utot, fill=true, value=true, cmm="Partie reelle du Champ Total (Reference)");
+plot(udiff, fill=true, value=true, cmm="Partie reelle difference entre OG et PML");
