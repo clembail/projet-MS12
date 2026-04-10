@@ -1,0 +1,78 @@
+// Import python
+mesh Th1 = readmesh("./data/mesh.msh");
+plot(Th1, wait=true, cmm="Maillage du domaine (appuyez sur Entree pour continuer)");
+fespace Vh1(Th1, P1);
+Vh1 S;
+ifstream fileUh("./data/S.txt");
+fileUh >> S[];
+
+// Paramètres
+real k = 2*pi;
+real a = 2.0;
+real R = 1;
+
+// Frontière objet
+border C(t=0, 2*pi){x=R*cos(t); y=R*sin(t); label=1; }
+
+// Frontière extérieure
+border sq1(t=0, 1){x=-a+2*a*t; y=-a      ; label=2; }
+border sq2(t=0, 1){x=a       ; y=-a+2*a*t; label=2; }
+border sq3(t=0, 1){x=a-2*a*t ; y=a       ; label=2; }
+border sq4(t=0, 1){x=-a      ; y=a-2*a*t ; label=2; }
+
+// Maillage
+real lambda = 2*pi/k;
+real h      = lambda/8;
+int nC      = int(2*pi*R/h);     // nb points sur le cercle extérieur
+int nSq     = int(2*a/h);        // nb points par côté du carré
+
+mesh Th2 = buildmesh(sq1(nSq) + sq2(nSq) + sq3(nSq) + sq4(nSq) + C(-nC));
+plot(Th2, wait=true, cmm="Maillage du domaine (appuyez sur Entree pour continuer)");
+
+fespace Vh2(Th2, P2);
+Vh2<complex> vh = exp(1i*k*S);
+
+plot(vh, value=true, wait=true, fill=true, nbiso=30, cmm="Champ total (partie reelle)");
+
+
+// PML
+real R0       = 1.5;
+real sigmaMax = 5.0;
+
+func real sigma(real r) {
+  if (r <= R0) {
+      return 0.0;
+  } else {
+      return sigmaMax * (r - R0)^2;
+  }
+}
+
+func real dsigma(real r) {
+  if (r <= R0) {
+    return 0.0;
+  } else {
+    return sigmaMax * 2 * (r - R0);
+  }
+}
+
+macro r() (sqrt(x^2 + y^2)) //
+macro alpha() (1.0 + 1i * sigma(r)) //
+macro beta() (alpha + 1i * r * dsigma(r)) //
+
+macro A11() (beta/alpha + (alpha/beta - beta/alpha)*x*x/(r*r)) //
+macro A12() (0          + (alpha/beta - beta/alpha)*x*y/(r*r)) //
+macro A21() (0          + (alpha/beta - beta/alpha)*y*x/(r*r)) //
+macro A22() (beta/alpha + (alpha/beta - beta/alpha)*y*y/(r*r)) //
+
+
+Vh2<complex> u, v;
+
+problem HelmholtzPML(u, v)
+  = int2d(Th2)(
+    (1.0/k^2) * (
+      A11 * dx(u) * dx(v) + A12 * dx(u) * dy(v) +
+      A21 * dy(u) * dx(v) + A22 * dy(u) * dy(v)
+    )
+    - alpha * beta * u * v
+  )
+  + /* IL MANQUE LES CONDITIONS AUX LIMITES ICI */ ;
