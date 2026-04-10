@@ -58,7 +58,7 @@ contour = plt.tricontourf(Th, S_total, levels=50, cmap='viridis')
 plt.colorbar(contour, label='Phase S (Chemin optique)')
 
 t_plot = np.linspace(0, 2*np.pi, 200)
-plt.fill(obstacle.M(t_plot).x, obstacle.M(t_plot).y, color='black')
+plt.fill(obstacle.M(t_plot).x, obstacle.M(t_plot).y, color='white')
 
 for i in range(nb_rayons):
 
