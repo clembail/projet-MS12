@@ -1,0 +1,84 @@
+import matplotlib.tri as tri
+import matplotlib.pyplot as plt
+import numpy as np
+import curves
+import vec2d
+import pyff
+
+obstacle = curves.circle()
+# obstacle.plot()
+# plt.axis("equal")
+# plt.show()
+
+x_min                = -2
+theta_min, theta_max = np.pi/2, 3*np.pi/2
+L                    = 3.5
+nb_rayons            = 100
+nb_points            = 50
+
+rayons_init = np.linspace(theta_min, theta_max, nb_rayons) # paramètres des impacts de rayon sur la sphère
+distances   = np.linspace(0, L, nb_points)
+
+points   = obstacle.M(rayons_init)
+normales = obstacle.N(rayons_init)
+
+X_impact = points.x
+Y_impact = points.y
+S_impact = X_impact
+n_x      = normales.x
+n_y      = normales.y
+
+X_total = []
+Y_total = []
+S_total = []
+
+one = np.ones((nb_rayons,))
+
+for distance in distances:
+
+  v_ref = (1 - 2*n_x*n_x, -2*n_x*n_y)
+
+  X_rayon = X_impact + distance*v_ref[0]
+  Y_rayon = Y_impact + distance*v_ref[1]
+  S_rayon = S_impact + distance*one
+
+  X_total.extend(X_rayon)
+  Y_total.extend(Y_rayon)
+  S_total.extend(S_rayon)
+
+Th = tri.Triangulation(X_total, Y_total)
+
+pyff.savemesh(Th, "exo/data/mesh.msh")
+pyff.savevector(np.array(S_total), "exo/data/S.txt")
+
+plt.figure(figsize=(10, 8))
+
+# tracé q1 et q2
+contour = plt.tricontourf(Th, S_total, levels=50, cmap='viridis')
+plt.colorbar(contour, label='Phase S (Chemin optique)')
+
+t_plot = np.linspace(0, 2*np.pi, 200)
+plt.fill(obstacle.M(t_plot).x, obstacle.M(t_plot).y, color='black')
+
+for i in range(nb_rayons):
+
+    x_depart = x_min
+    y_depart = Y_impact[i] 
+    
+    x_imp = X_impact[i]
+    y_imp = Y_impact[i]
+    
+    v_ref_x = 1 - 2 * n_x[i]**2
+    v_ref_y = -2 * n_x[i] * n_y[i]
+    x_fin = x_imp + L * v_ref_x
+    y_fin = y_imp + L * v_ref_y
+    
+    plt.plot([x_depart, x_imp, x_fin], [y_depart, y_imp, y_fin], color='red', alpha=0.3)
+
+plt.gca().set_aspect('equal', adjustable='box')
+plt.xlim(-2, 2)
+plt.ylim(-2, 2)
+plt.title("Optique géométrique : Rayons et Phase S")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.show()
