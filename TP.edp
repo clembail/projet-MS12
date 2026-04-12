@@ -8,7 +8,7 @@ fileUh >> S[];
 
 // Paramètres
 real k = 4*pi;
-real a = 2.0;
+real a = 3.0;
 real R = 1;
 
 // Frontière objet
@@ -30,7 +30,7 @@ mesh Th2 = buildmesh(sq1(nSq) + sq2(nSq) + sq3(nSq) + sq4(nSq) + C(-nC));
 plot(Th2, wait=true, cmm="Maillage du domaine (appuyez sur Entree pour continuer)");
 
 fespace Vh2(Th2, P2);
-Vh2<complex> vh = exp(1i*k*S);
+Vh2<complex> vh = -exp(1i*k*S);
 
 plot(vh, value=true, wait=true, fill=true, nbiso=30, cmm="Champ total (partie reelle)");
 
