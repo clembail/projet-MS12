@@ -5,6 +5,9 @@ fespace Vh1(Th1, P1);
 Vh1 S;
 ifstream fileUh("./data/S.txt");
 fileUh >> S[];
+Vh1 A;
+ifstream fileA("./data/A.txt");
+fileA >> A[];
 
 // Paramètres
 real k = 4*pi;
@@ -30,9 +33,9 @@ mesh Th2 = buildmesh(sq1(nSq) + sq2(nSq) + sq3(nSq) + sq4(nSq) + C(-nC));
 plot(Th2, wait=true, cmm="Maillage du domaine (appuyez sur Entree pour continuer)");
 
 fespace Vh2(Th2, P2);
-Vh2<complex> vh = -exp(1i*k*S);
+Vh2<complex> vh = A*exp(1i*k*S);
 
-plot(vh, value=true, wait=true, fill=true, nbiso=30, cmm="Champ total (partie reelle)");
+plot(vh, value=true, wait=true, fill=true, nbiso=30, cmm="Champ diffracte OG (partie reelle)");
 
 
 // PML
@@ -78,9 +81,10 @@ problem HelmholtzPML(u, v)
   + on(1, u=-exp(1i * k * x));
 
 HelmholtzPML;
+plot(u, value=true, wait=true, fill=true, nbiso=30, cmm="Champ diffracte FreeFEM++ (partie reelle)");
 
 Vh2<complex> utot = u + exp(1i * k * x);
 Vh2 udiff = abs(u - vh)*(r <= R0);
 
-plot(utot, fill=true, value=true, cmm="Partie reelle du Champ Total (Reference)");
+// plot(utot, fill=true, value=true, cmm="Champ Total (partie reelle)");
 plot(udiff, fill=true, value=true, cmm="Partie reelle difference entre OG et PML");

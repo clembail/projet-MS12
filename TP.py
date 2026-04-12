@@ -31,6 +31,7 @@ n_y      = normales.y
 X_total = []
 Y_total = []
 S_total = []
+A_total = []
 
 one = np.ones((nb_rayons,))
 
@@ -42,14 +43,21 @@ for distance in distances:
   Y_rayon = Y_impact + distance*v_ref[1]
   S_rayon = S_impact + distance*one
 
+  n_x_safe = np.minimum(n_x, -1e-5) 
+    
+  J = 1 - (2 * distance) / n_x_safe
+  A_rayon = -1.0 / np.sqrt(J)
+
   X_total.extend(X_rayon)
   Y_total.extend(Y_rayon)
   S_total.extend(S_rayon)
+  A_total.extend(A_rayon)
 
 Th = tri.Triangulation(X_total, Y_total)
 
 pyff.savemesh(Th, "exo/data/mesh.msh")
 pyff.savevector(np.array(S_total), "exo/data/S.txt")
+pyff.savevector(np.array(A_total), "exo/data/A.txt")
 
 plt.figure(figsize=(10, 8))
 
