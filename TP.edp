@@ -1,6 +1,8 @@
+load "Element_P4"
+
 // Import python
 mesh Th1 = readmesh("./data/mesh.msh");
-plot(Th1, wait=true, cmm="Maillage du domaine (appuyez sur Entree pour continuer)");
+plot(Th1, wait=true, cmm="Maillage Python");
 fespace Vh1(Th1, P1);
 Vh1 S;
 ifstream fileUh("./data/S.txt");
@@ -25,17 +27,29 @@ border sq4(t=0, 1){x=-a      ; y=a-2*a*t ; label=2; }
 
 // Maillage
 real lambda = 2*pi/k;
-real h      = lambda/8;
-int nC      = int(2*pi*R/h);     // nb points sur le cercle extérieur
-int nSq     = int(2*a/h);        // nb points par côté du carré
+real h      = lambda/4;
+int nC      = int(2*pi*R/h);     
+int nSq     = int(2*a/h);        
 
 mesh Th2 = buildmesh(sq1(nSq) + sq2(nSq) + sq3(nSq) + sq4(nSq) + C(-nC));
-plot(Th2, wait=true, cmm="Maillage du domaine (appuyez sur Entree pour continuer)");
+plot(Th2, wait=true, cmm="Maillage FreeFEM++");
 
-fespace Vh2(Th2, P2);
-Vh2<complex> vh = A*exp(1i*k*S);
+// -----------------------------------------------------------------------------
+// [CONSEIL 5 du PDF] : Réduire l'effet de pollution avec des éléments d'ordre 4.
+// On change P2 en P4 pour avoir une solution de référence très précise.
+// -----------------------------------------------------------------------------
+fespace Vh2(Th2, P4);
 
-plot(vh, value=true, wait=true, fill=true, nbiso=30, cmm="Champ diffracte OG (partie reelle)");
+// 1. On définit vh sur le maillage Python Th1 en premier
+Vh1<complex> vh1 = A * exp(1i*k*S); 
+
+// 3. On crée le champ sur le maillage final Th2
+Vh2<complex> vh;
+vh = (x > 0 && abs(y) < 1.0) ? -exp(1i*k*x) : vh1;
+
+Vh2 vhReel = real(vh1);
+
+plot(vhReel, value=true, wait=true, fill=true, nbiso=30, cmm="Partie réelle du champ diffracte OG");
 
 
 // PML
@@ -43,19 +57,13 @@ real R0       = 1.75;
 real sigmaMax = 5.0;
 
 func real sigma(real r) {
-  if (r <= R0) {
-      return 0.0;
-  } else {
-      return sigmaMax * (r - R0)^2;
-  }
+  if (r <= R0) { return 0.0; } 
+  else { return sigmaMax * (r - R0)^2; }
 }
 
 func real dsigma(real r) {
-  if (r <= R0) {
-    return 0.0;
-  } else {
-    return sigmaMax * 2 * (r - R0);
-  }
+  if (r <= R0) { return 0.0; } 
+  else { return sigmaMax * 2 * (r - R0); }
 }
 
 macro r() (sqrt(x^2 + y^2)) //
@@ -68,10 +76,11 @@ macro A21() (0          + (alpha/beta - beta/alpha)*y*x/(r*r)) //
 macro A22() (beta/alpha + (alpha/beta - beta/alpha)*y*y/(r*r)) //
 
 
+// Question 4
 Vh2<complex> u, v;
 
 problem HelmholtzPML(u, v)
-  = int2d(Th2)(
+  = int2d(Th2, qforder=9)( // quadrature plus élevée pour éléments P4
     (1.0/k^2) * (
       A11 * dx(u) * dx(v) + A12 * dx(u) * dy(v) +
       A21 * dy(u) * dx(v) + A22 * dy(u) * dy(v)
@@ -81,10 +90,40 @@ problem HelmholtzPML(u, v)
   + on(1, u=-exp(1i * k * x));
 
 HelmholtzPML;
-plot(u, value=true, wait=true, fill=true, nbiso=30, cmm="Champ diffracte FreeFEM++ (partie reelle)");
 
-Vh2<complex> utot = u + exp(1i * k * x);
+Vh2 uReel = real(u);
+plot(uReel, value=true, wait=true, fill=true, nbiso=30, cmm="Partie réelle du champ diffracte FreeFEM++ (PML)");
+
+
+// Question 5
 Vh2 udiff = abs(u - vh)*(r <= R0);
+plot(udiff, fill=true, value=true, cmm="Erreur absolue entre OG et PML (Visuelle)");
 
-// plot(utot, fill=true, value=true, cmm="Champ Total (partie reelle)");
-plot(udiff, fill=true, value=true, cmm="Partie reelle difference entre OG et PML");
+
+// Question 6
+border physBound(t=0, 2*pi){x=R0*cos(t); y=R0*sin(t); label=3;} 
+
+// maillage fin
+real hErr = h / 2.0;
+int nPhys = int(2*pi*R0 / hErr);
+int nCErr = int(2*pi*R / hErr);
+
+mesh ThPhys = buildmesh(physBound(nPhys) + C(-nCErr));
+
+// élément P1 pour calculer l'erreur
+fespace VhPhys(ThPhys, P1);
+
+VhPhys<complex> uPhys = u; 
+VhPhys<complex> vhPhys = (x > 0 && abs(y) < 1.0) ? -exp(1i*k*x) : vh1;
+
+// calcul de l'erreur L2
+real errL2 = sqrt(int2d(ThPhys)( abs(uPhys - vhPhys)^2 ));
+real normL2 = sqrt(int2d(ThPhys)( abs(uPhys)^2 ));
+real errRelative = errL2 / normL2;
+
+cout << "\n=======================================================" << endl;
+cout << " ANALYSE D'ERREUR POUR k = " << k << " (ATTENDU 2 DU PROJET)" << endl;
+cout << "=======================================================" << endl;
+cout << " Erreur absolue L2 (domaine physique) : " << errL2 << endl;
+cout << " Erreur relative L2 : " << errRelative << endl;
+cout << "=======================================================\n" << endl;
