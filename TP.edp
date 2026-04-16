@@ -49,7 +49,7 @@ vh = (x > 0 && abs(y) < 1.0) ? -exp(1i*k*x) : vh1;
 
 Vh2 vhReel = real(vh1);
 
-plot(vhReel, value=true, wait=true, fill=true, nbiso=30, cmm="Partie réelle du champ diffracte OG");
+plot(vhReel, value=true, wait=true, fill=true, nbiso=30, cmm="Partie reelle du champ diffracte OG");
 
 
 // PML
@@ -92,7 +92,7 @@ problem HelmholtzPML(u, v)
 HelmholtzPML;
 
 Vh2 uReel = real(u);
-plot(uReel, value=true, wait=true, fill=true, nbiso=30, cmm="Partie réelle du champ diffracte FreeFEM++ (PML)");
+plot(uReel, value=true, wait=true, fill=true, nbiso=30, cmm="Partie reelle du champ diffracte FreeFEM++ (PML)");
 
 
 // Question 5
