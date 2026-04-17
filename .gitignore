@@ -1,1 +1,16 @@
+#autre
 TP_bis.py
+carre.edp
+TP.pdf
+__pycache__
+FreeFEM-documentation.pdf
+.DS_Store
+
+#tex
+main.aux
+main.fdb_latexmk
+main.fls
+main.log
+main.pdf
+main.synctex.gz
+main.toc
