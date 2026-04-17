@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #autre
 TP_bis.py
 carre.edp
@@ -14,3 +15,7 @@ main.log
 main.pdf
 main.synctex.gz
 main.toc
+=======
+TP_bis.py
+out_dir/
+>>>>>>> 0083aef (màj rapport sauf questions théoriques)

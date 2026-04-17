@@ -26,9 +26,13 @@ Dans ce projet, on implémente l'approximation de l’optique géométrique pour
 
 \section{Objectifs numériques}
 
-On s’intéresse au problème extérieur de Helmholtz pour une onde plane incidente
+\noindent On s’intéresse au problème extérieur de Helmholtz pour une onde plane incidente
 \[
+<<<<<<< HEAD
 u^{\mathrm{inc}}(x,y)=e^{ikx},
+=======
+u^{\mathrm{inc}}(x)=\mathrm{e}^{\mathrm{i} k x_1},
+>>>>>>> 0083aef (màj rapport sauf questions théoriques)
 \]
 diffractée par un obstacle convexe \(\Omega \subset \mathbb{R}^2\).
 
@@ -45,38 +49,53 @@ diffractée par un obstacle convexe \(\Omega \subset \mathbb{R}^2\).
 
 \subsection{Visualisation de la solution $S$ de l'équation eikonale et tracé des caractéristiques associées à l'équation eikonale}
 
+La figure \ref{fig:rayons} présente la solution $S$ de l'équation eikonale et les caractéristiques associées à cette équation pour différentes formes d'obstacles convexes. On observe que les rayons sont perpendiculaires aux fronts d'ondes, conformément à la théorie de l'optique géométrique. De plus, on observe bien la zone d'ombre derrière les obstacles, où les rayons ne pénètrent pas.
+
 \begin{figure}[H]
 \centering
 \begin{subfigure}[t]{.5\textwidth}
     \centering
     \includegraphics[width=\textwidth]{img/OG_rayons_phaseS.png}
-    \caption{Disque}
+    \caption{Obstacle en forme de disque}
 \end{subfigure}%
 \begin{subfigure}[t]{.5\textwidth}
     \centering
     \includegraphics[width=\textwidth]{img/OG_rayons_phaseS_roundedpolygon.png}
-    \caption{Polygone arrondi avec un angle d'incidence de $5\pi/4$}
+    \caption{Obstacle en forme de polygone arrondi avec un angle d'incidence de $5\pi/4$}
 \end{subfigure}
 \caption{Visualisation de la solution $S$ de l'équation eikonale et tracé des caractéristiques associées à l'équation eikonale pour différentes formes d'obstacles convexes. Nombre de rayons: $100$}
+\label{fig:rayons}
 \end{figure}
 
+\noindent Dans la suite, on se concentre sur l'obstacle en forme de disque. \\
+
+La calcul des rayons est utilisé pour évaluer les quantités géométriques nécessaires à l'approximation de l'optique géométrique en des points particuliers le long de ces rayons. L’idée est ensuite de créer un maillage dont les sommets sont les points d'échantillonnage des rayons. Ce maillage (figure \ref{fig:maillage_OG_python}) est ensuite importé dans FreeFem++ pour construire l'approximation d'optique géométrique et la comparer à une solution de référence calculée par éléments finis avec PML.
+
+Le maillage pour calculer la solution de référence est construit avec un pas de discrétisation $\boxed{h = \frac{\pi}{2k}}$ pour garantir une bonne résolution de la solution, notamment à haute fréquence. Ce maillage est présenté sur la figure \ref{fig:maillage_freefem}.
 
 \begin{figure}[H]
 \centering
 \begin{subfigure}[t]{.5\textwidth}
     \centering
     \includegraphics[width=.6\textwidth]{img/maillage_OG_python.png}
-    \caption{Maillage Python pour l'approximation de l'optique géométrique. Nombre de rayons: $100$, nombre de points de discrétisation par rayon: $50$}
+    \caption{Maillage généré avec Python pour l'approximation de l'optique géométrique. Nombre de rayons: $100$, nombre de points de discrétisation par rayon: $50$}
+    \label{fig:maillage_OG_python}
 \end{subfigure}%
 \begin{subfigure}[t]{.5\textwidth}
     \centering
     \includegraphics[width=.6\textwidth]{img/maillage_freefem.png}
-    \caption{Maillage FreeFem++ pour la solution de référence. $\boxed{h = \frac{\pi}{2k}}$ avec $k = 4\pi$.}
+    \caption{Maillage FreeFem++ pour la solution de référence.}
+    \label{fig:maillage_freefem}
 \end{subfigure}
 \caption{Visualisation des maillages utilisés pour l'approximation d'optique géométrique et la solution de référence calculée par éléments finis avec PML}
+\label{fig:maillages}
 \end{figure}
 
 \subsection{Tracé de la partie réelle de la solution des équations de l'optique géométrique}
+
+La figure \ref{fig:partie_reelle_OG} présente la partie réelle de la solution des équations de l'optique géométrique pour différentes fréquences $k$. On observe que l'approximation de l'optique géométrique est bonne dans les zones éclairées, mais elle ne permet pas de modéliser correctement la zone d'ombre où l'ansatz de l'optique géométrique devient faux car il coupe artificiellement le champ, néglige les phénomènes de diffraction et ne prend pas en compte les rayons rampants.
+
+De plus, on observe que pour $k = 12 \pi$, la qualité de la solution se dégrade par rapport à des fréquences plus basses. 
 
 \begin{figure}[H]
     \centering
@@ -96,9 +115,22 @@ diffractée par un obstacle convexe \(\Omega \subset \mathbb{R}^2\).
         \caption{$k = 12\pi$}
     \end{subfigure}
     \caption{Partie réelle du champ diffracté par l'optique géométrique pour différentes fréquences $k$}
+    \label{fig:partie_reelle_OG}
 \end{figure}
 
 \subsection{Tracé de la partie réelle d'une solution de référence calculée par éléments finis avec la méthode de troncature par PML}
+
+La figure \ref{fig:partie_reelle_pml} présente la partie réelle d'une solution de référence calculée par éléments finis avec la méthode de troncature par PML pour différentes fréquences $k$. 
+
+On a choisi le profil d'absorption de la couche PML de la forme
+\[
+\sigma(r) = 
+\begin{cases}
+    0 & \text{si } r \leqslant R_0 \\
+    5(r - R_0)^2 & \text{si } r > R_0
+\end{cases}.
+\]
+On observe que la solution de référence est très similaire à l'approximation de l'optique géométrique dans les zones éclairées, mais elle est beaucoup plus précise près de la frontière lumière/ombre. De plus, on observe des phénomènes de diffraction qui ne sont pas pris en compte dans l'approximation de l'optique géométrique. Enfin, on observe que la solution de référence est bien absorbée par la couche PML, ce qui permet de limiter les réflexions parasites à la frontière du domaine de calcul.
 
 \begin{figure}[H]
     \centering
@@ -117,10 +149,17 @@ diffractée par un obstacle convexe \(\Omega \subset \mathbb{R}^2\).
         \includegraphics[width=.4\textwidth]{img/partie_reelle_champ_diff_pml_12pi.png}
         \caption{$k = 12\pi$}
     \end{subfigure}
-    \caption{Partie réelle d'une solution de référence calculée par éléments finis avec la méthode de troncature par PML pour différentes fréquences $k$}
+    \caption{Partie réelle d'une solution de référence calculée par éléments finis avec la méthode de troncature par PML pour différentes fréquences $k$. Paramètres : Rayon de l'obstacle: $1$, rayon intérieur de la couche PML : $R_0 = 1.75$, domaine de calcul: $[-3, 3] \times [-3, 3]$}
+    \label{fig:partie_reelle_pml}
 \end{figure}
 
-\subsection{Tracé de la valeur absolue de la différence entre ces deux fonctions}
+\subsection{Tracé de la valeur absolue de la différence entre ces deux fonctions et calcul de l'erreur en norme $L^2$ sur le domaine de calcul "physique"}
+
+La figure \ref{fig:erreur} présente la valeur absolue de la différence entre les solutions de l'optique géométrique et de référence calculée par éléments finis avec PML pour différentes fréquences $k$.
+
+On observe plusieurs zones d'erreur. Tout d'abord, l'erreur est très faible dans les zones éclairées, ce qui confirme que l'approximation de l'optique géométrique est bonne dans ces zones. En revanche, l'erreur est très forte près de la frontière lumière/ombre, ce qui confirme que l'ansatz de l'optique géométrique devient faux dans cette zone. À mesure que la fréquence augmente, on observe également une augmentation de l'erreur au niveau de la zone d'impact à gauche de l'obstacle. 
+
+Enfin, on observe que dans l'ensemble, l'erreur augmente avec la fréquence $k$, ce qui est cohérent avec la théorie du problème de Helmholtz à haute fréquence, notamment en raison de l'effet de pollution.
 
 \begin{figure}[H]
     \centering
@@ -141,53 +180,16 @@ diffractée par un obstacle convexe \(\Omega \subset \mathbb{R}^2\).
     \label{fig:erreur}
 \end{figure}
 
-\subsection{Calcul de l'erreur en norme $L^2$ sur le domaine de calcul "physique"}
+La figure \ref{fig:erreur_L2} présente l'erreur en norme $L^2$ entre les solutions de l'optique géométrique et de référence calculée par éléments finis avec PML en fonction de la fréquence $k$. Ces courbes confirment les observations faites précédemment : l'erreur en norme $L^2$ augmente avec la fréquence $k$.
 
 \begin{figure}[H]
     \centering
     \input{erreur.tex}
     \caption{Erreur en norme $L^2$ entre l'approximation d'optique géométrique et la solution de référence calculée par éléments finis avec PML en fonction de la fréquence $k$.}
+    \label{fig:erreur_L2}
 \end{figure}
 
-L’erreur $L^2$ et l’erreur relative augmentent avec le nombre d’onde $k$. Ce comportement est cohérent avec la théorie du problème de Helmholtz à haute fréquence. 
-
-{\color{red}
-À commenter :
-\begin{itemize}
-    \item les zones où l’approximation est bonne ;
-    \item les zones où elle est mauvaise ;
-    \item l’effet de la zone d’ombre ;
-    \item la dépendance en fréquence.
-\end{itemize}
-
-\begin{itemize}
-    \item \textbf{Méthode :} implémentation de l’approximation d’optique géométrique (ansatz WKB), basée sur la résolution de l’équation eikonale pour la phase et des équations de transport pour l’amplitude.
-
-    \item \textbf{Résultats :} bonne approximation dans les zones éclairées, mais augmentation de l’erreur avec la fréquence $k$, liée à l’effet de pollution et à l’amplification par la résolvante.
-
-    \item \textbf{Limites :} échec en zone d’ombre, discontinuités aux caustiques, absence de prise en compte des phénomènes de diffraction.
-
-    \item \textbf{Améliorations :} utilisation de l’optique physique, corrections en zone d’ombre, et prise en compte des rayons rampants pour mieux modéliser la diffraction.
-\end{itemize}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{ll}
-\toprule
-Paramètre & Valeur \\
-\midrule
-Obstacle & cercle de rayon 1 \\
-\(x_{\min}\) & \(-2\) \\
-\(\theta_{\min}\) & \(\pi/2\) \\
-\(\theta_{\max}\) & \(3\pi/2\) \\
-\(L\) & \(3.5\) \\
-Nombre de rayons & \(100\) \\
-Nombre de points par rayon & \(50\) \\
-\bottomrule
-\end{tabular}
-\caption{Exemple de paramètres utilisés dans les calculs géométriques.}
-\end{table}
-}
+Une amélioration possible de l'optique géométrique est d'appliquer l'optique physique, qui prend en compte les phénomènes de diffraction et les rayons rampants. Cette approche permettrait de réduire l'erreur près de la frontière lumière/ombre et d'améliorer la qualité de l'approximation à haute fréquence.
 
 \section{Questions théoriques}
 
