@@ -186,13 +186,29 @@ La figure \ref{fig:erreur_L2} présente l'erreur en norme $L^2$ entre les soluti
 \end{figure}
 
 Une amélioration possible de l'optique géométrique est d'appliquer l'optique physique, qui prend en compte les phénomènes de diffraction et les rayons rampants. Cette approche permettrait de réduire l'erreur près de la frontière lumière/ombre et d'améliorer la qualité de l'approximation à haute fréquence.
+
 \section{Questions théoriques}
 
-{\color{red}
+Nous avons repris les questions, écrites en noir, et nos réponses sont écrites en bleu.
+
 \begin{enumerate}
-    \item Une fonction ayant un saut non nul n'est pas dans $H^1_\mathrm{loc}$.
-    \item Comme nous l'observons sur la figure \ref{fig:erreur}, l'erreur est la plus forte près de la frontière lumière/ombre. C’est dans cette zone que l’ansatz de l'optique géométrique devient faux car il coupe artificiellement le champ, néglige les phénomènes de diffraction et ne prend pas en compte les rayons rampants. De plus, la solution est très oscillante dans cette zone, ce qui rend la résolution numérique plus difficile.
+    \item {\color{black}Des résultats théoriques sur l'erreur entre la solution de l'optique géométrique et la solution de
+    \[
+    \begin{cases}
+    -(\Delta + k^2) u &= 0 \quad \text{dans } \mathbb{R}^2 \setminus \overline{\Omega}, \\
+    \hfill u &= g \quad \text{sur } \partial \Omega, \\
+    \hfill \partial_r u - \mathrm{i} k u &= o(r^{-(d-1)/2}) \quad \text{uniformément pour } r \to +\infty.
+    \end{cases}
+    \]
+    existent. La stratégie est d'écrire
+    \[
+    P(k)(u - u_\mathrm{Ansatz}) = O(k^{-2})
+    \]
+    puis d'utiliser une estimation de la norme $\rho(k)$ de l'inverse de $P$, afin d'en déduire une estimation pour $\Vert u - u_\mathrm{Ansatz} \Vert$. Pour un obstacle convexe, on a l'estimation $\rho(k) = O(k)$. Noter que pour une onde plane, la solution de l'optique géométrique ne vérifie pas la condition de Sommerfeld dans la zone d'ombre. {\color{blue}En effet, l'optique géométrique annule artificiellement le champ dans la zone d'ombre, alors que la solution exacte contient un champ diffracté non nul. Ainsi, elle ne satisfait pas la condition de rayonnement et ne constitue pas une solution sortante de l’équation de Helmholtz.} \\
+    De plus, elle n'est pas dans $H^1_\mathrm{loc}(\Omega^+)$.} {\color{blue}En effet, l’Ansatz présente un saut non nul sur la frontière lumière/ombre, ce qui empêche son appartenance à $H^1_\mathrm{loc}$.} {\color{black}Pourquoi ceci pose-t-il une difficulté pour la stratégie schématisée ci-dessus ?} {\color{blue}La stratégie repose sur l’écriture $u-u_{\mathrm{Ansatz}} = R(k)P(k)(u-u_{\mathrm{Ansatz}})$, qui nécessite un résidu régulier. Or, comme la solution de l'optique géométrique n'est pas dans $H^1_\mathrm{loc}$, cela signifie qu'elle peut présenter des singularités ou des discontinuités, donc $P(k)(u_{\mathrm{Ansatz}})$ contient des termes singuliers, ce qui empêche l’application directe des estimations de la résolvante.} {\color{black} Comment ces problèmes sont-ils résolus l'article de Morawetz et Ludwig ?} {\color{black} Quel résultat peut-on espérer pour l'erreur lorsqu'on s'en tient à l'Ansatz de l'optique géométrique ?} % {\color{blue}On peut espérer une erreur de l’ordre $O(k^{-1})$ dans les zones régulières (loin des transitions), mais pas une approximation uniforme sur tout le domaine, en particulier près de la frontière lumière/ombre.}
+    
+    \item {\color{black} Dans quelle zone l'erreur est-elle la plus grande ?} {\color{blue}L’erreur est maximale près de la frontière lumière/ombre et dans la zone d’ombre, où l’optique géométrique ne prend pas en compte les phénomènes de diffraction et de rayons rampants.} {\color{black} Y a-t-il des zones où l'erreur semble converger vers $0$ quand $k \to \infty$ ?} {\color{blue}Oui, dans les zones éclairées, loin des régions de transition, où l’optique géométrique décrit correctement la propagation des rayons.} {\color{black} À quelle vitesse ?} % {\color{blue}Typiquement à vitesse $O(k^{-1})$ dans ces zones, en lien avec un résidu en $O(k^{-2})$ et $\rho(k)=O(k)$.} 
+    {\color{black} Peut-on expliquer informellement ce comportement ?} {\color{blue}À haute fréquence, la propagation est bien décrite par les rayons géométriques en zone éclairée, ce qui rend l’approximation précise. En revanche, près de la frontière d’ombre, des effets de la diffraction dominent et ne sont pas capturés par l’optique géométrique, ce qui explique une erreur plus importante.}
 \end{enumerate}
-}
 
 \end{document}
