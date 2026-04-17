@@ -28,7 +28,7 @@ Dans ce projet, on implémente l'approximation de l’optique géométrique pour
 
 \noindent On s’intéresse au problème extérieur de Helmholtz pour une onde plane incidente
 \[
-u^{\mathrm{inc}}(x)=\mathrm{e}^{\mathrm{i} k x_1},
+u^{\mathrm{inc}}(x,y)=\mathrm{e}^{\mathrm{i} k x},
 \]
 diffractée par un obstacle convexe \(\Omega \subset \mathbb{R}^2\).
 
@@ -43,7 +43,7 @@ diffractée par un obstacle convexe \(\Omega \subset \mathbb{R}^2\).
     \item calculer l’erreur en norme $L^2$ sur le domaine de calcul ``physique'' (donc en retirant la couche PML).
 \end{enumerate}
 
-\subsection{Visualisation de la solution $S$ de l'équation eikonale et tracé des caractéristiques associées à l'équation eikonale}
+\subsection{Visualisation de la solution S de l'équation eikonale et tracé des caractéristiques associées à l'équation eikonale}
 
 La figure \ref{fig:rayons} présente la solution $S$ de l'équation eikonale et les caractéristiques associées à cette équation pour différentes formes d'obstacles convexes. On observe que les rayons sont perpendiculaires aux fronts d'ondes, conformément à la théorie de l'optique géométrique. De plus, on observe bien la zone d'ombre derrière les obstacles, où les rayons ne pénètrent pas.
 
@@ -67,7 +67,9 @@ La figure \ref{fig:rayons} présente la solution $S$ de l'équation eikonale et 
 
 La calcul des rayons est utilisé pour évaluer les quantités géométriques nécessaires à l'approximation de l'optique géométrique en des points particuliers le long de ces rayons. L’idée est ensuite de créer un maillage dont les sommets sont les points d'échantillonnage des rayons. Ce maillage (figure \ref{fig:maillage_OG_python}) est ensuite importé dans FreeFem++ pour construire l'approximation d'optique géométrique et la comparer à une solution de référence calculée par éléments finis avec PML.
 
-Le maillage pour calculer la solution de référence est construit avec un pas de discrétisation $\boxed{h = \frac{\pi}{2k}}$ pour garantir une bonne résolution de la solution, notamment à haute fréquence. Ce maillage est présenté sur la figure \ref{fig:maillage_freefem}.
+Le maillage utilisé pour calculer la solution de référence est construit avec un pas de discrétisation 
+$$\boxed{h = \frac{\pi}{2k}}$$
+pour garantir une bonne résolution de la solution, notamment à haute fréquence. Ce maillage est présenté sur la figure \ref{fig:maillage_freefem}.
 
 \begin{figure}[H]
 \centering
@@ -89,9 +91,7 @@ Le maillage pour calculer la solution de référence est construit avec un pas d
 
 \subsection{Tracé de la partie réelle de la solution des équations de l'optique géométrique}
 
-La figure \ref{fig:partie_reelle_OG} présente la partie réelle de la solution des équations de l'optique géométrique pour différentes fréquences $k$. On observe que l'approximation de l'optique géométrique est bonne dans les zones éclairées, mais elle ne permet pas de modéliser correctement la zone d'ombre où l'ansatz de l'optique géométrique devient faux car il coupe artificiellement le champ, néglige les phénomènes de diffraction et ne prend pas en compte les rayons rampants.
-
-De plus, on observe que pour $k = 12 \pi$, la qualité de la solution se dégrade par rapport à des fréquences plus basses. 
+La figure \ref{fig:partie_reelle_OG} présente la partie réelle de la solution des équations de l'optique géométrique pour différentes fréquences $k$. On observe que l'approximation de l'optique géométrique est bonne dans les zones éclairées, mais elle ne permet pas de modéliser correctement la zone d'ombre où l'ansatz de l'optique géométrique devient faux; il coupe artificiellement le champ, néglige les phénomènes de diffraction et ne prend pas en compte les rayons rampants. De plus, on observe que pour $k = 12 \pi$, la qualité de la solution se dégrade par rapport à des fréquences plus basses. 
 
 \begin{figure}[H]
     \centering
@@ -116,17 +116,15 @@ De plus, on observe que pour $k = 12 \pi$, la qualité de la solution se dégrad
 
 \subsection{Tracé de la partie réelle d'une solution de référence calculée par éléments finis avec la méthode de troncature par PML}
 
-La figure \ref{fig:partie_reelle_pml} présente la partie réelle d'une solution de référence calculée par éléments finis avec la méthode de troncature par PML pour différentes fréquences $k$. 
-
-On a choisi le profil d'absorption de la couche PML de la forme
+La figure \ref{fig:partie_reelle_pml} présente la partie réelle d'une solution de référence calculée par éléments finis avec la méthode de troncature par PML pour différentes fréquences $k$. On a choisi le profil d'absorption de la couche PML de la forme
 \[
 \sigma(r) = 
 \begin{cases}
     0 & \text{si } r \leqslant R_0 \\
-    5(r - R_0)^2 & \text{si } r > R_0
-\end{cases}.
+    5(r - R_0)^2 & \text{si } r > R_0.
+\end{cases}
 \]
-On observe que la solution de référence est très similaire à l'approximation de l'optique géométrique dans les zones éclairées, mais elle est beaucoup plus précise près de la frontière lumière/ombre. De plus, on observe des phénomènes de diffraction qui ne sont pas pris en compte dans l'approximation de l'optique géométrique. Enfin, on observe que la solution de référence est bien absorbée par la couche PML, ce qui permet de limiter les réflexions parasites à la frontière du domaine de calcul.
+On remarque que la solution de référence est très similaire à l'approximation de l'optique géométrique dans les zones éclairées, mais elle est beaucoup plus précise près de la frontière lumière/ombre. De plus, on observe des phénomènes de diffraction qui ne sont pas pris en compte dans l'approximation de l'optique géométrique. Enfin, la couche PML a l'effet escompté, et permet de limiter les réflexions parasites à la frontière du domaine de calcul.
 
 \begin{figure}[H]
     \centering
@@ -149,13 +147,14 @@ On observe que la solution de référence est très similaire à l'approximation
     \label{fig:partie_reelle_pml}
 \end{figure}
 
-\subsection{Tracé de la valeur absolue de la différence entre ces deux fonctions et calcul de l'erreur en norme $L^2$ sur le domaine de calcul "physique"}
+\subsection{Tracé de la valeur absolue de la différence entre ces deux fonctions et calcul de l'erreur en norme L2 sur le domaine de calcul "physique"}
 
-La figure \ref{fig:erreur} présente la valeur absolue de la différence entre les solutions de l'optique géométrique et de référence calculée par éléments finis avec PML pour différentes fréquences $k$.
-
-On observe plusieurs zones d'erreur. Tout d'abord, l'erreur est très faible dans les zones éclairées, ce qui confirme que l'approximation de l'optique géométrique est bonne dans ces zones. En revanche, l'erreur est très forte près de la frontière lumière/ombre, ce qui confirme que l'ansatz de l'optique géométrique devient faux dans cette zone. À mesure que la fréquence augmente, on observe également une augmentation de l'erreur au niveau de la zone d'impact à gauche de l'obstacle. 
-
-Enfin, on observe que dans l'ensemble, l'erreur augmente avec la fréquence $k$, ce qui est cohérent avec la théorie du problème de Helmholtz à haute fréquence, notamment en raison de l'effet de pollution.
+La figure \ref{fig:erreur} présente la valeur absolue de la différence entre les solutions de l'optique géométrique et de référence calculée par éléments finis avec PML pour différentes fréquences $k$. On observe plusieurs zones d'erreur : 
+\begin{itemize}
+    \item Tout d'abord, l'erreur est très faible dans les zones éclairées, ce qui confirme que l'approximation de l'optique géométrique est bonne dans ces zones. 
+    \item En revanche, l'erreur est très forte près de la frontière lumière/ombre, ce qui confirme que l'ansatz de l'optique géométrique devient faux dans cette zone. À mesure que la fréquence augmente, on observe également une augmentation de l'erreur au niveau de la zone d'impact à gauche de l'obstacle. 
+    \item Enfin, on observe que dans l'ensemble, l'erreur augmente avec la fréquence $k$, ce qui est cohérent avec la théorie du problème de Helmholtz à haute fréquence, notamment en raison de l'effet de pollution.
+\end{itemize}
 
 \begin{figure}[H]
     \centering
@@ -205,7 +204,7 @@ Nous avons repris les questions, écrites en noir, et nos réponses sont écrite
     P(k)(u - u_\mathrm{Ansatz}) = O(k^{-2})
     \]
     puis d'utiliser une estimation de la norme $\rho(k)$ de l'inverse de $P$, afin d'en déduire une estimation pour $\Vert u - u_\mathrm{Ansatz} \Vert$. Pour un obstacle convexe, on a l'estimation $\rho(k) = O(k)$. Noter que pour une onde plane, la solution de l'optique géométrique ne vérifie pas la condition de Sommerfeld dans la zone d'ombre. {\color{blue}En effet, l'optique géométrique annule artificiellement le champ dans la zone d'ombre, alors que la solution exacte contient un champ diffracté non nul. Ainsi, elle ne satisfait pas la condition de rayonnement et ne constitue pas une solution sortante de l’équation de Helmholtz.} \\
-    De plus, elle n'est pas dans $H^1_\mathrm{loc}(\Omega^+)$.} {\color{blue}En effet, l’Ansatz présente un saut non nul sur la frontière lumière/ombre, ce qui empêche son appartenance à $H^1_\mathrm{loc}$.} {\color{black}Pourquoi ceci pose-t-il une difficulté pour la stratégie schématisée ci-dessus ?} {\color{blue}La stratégie repose sur l’écriture $u-u_{\mathrm{Ansatz}} = R(k)P(k)(u-u_{\mathrm{Ansatz}})$, qui nécessite un résidu régulier. Or, comme la solution de l'optique géométrique n'est pas dans $H^1_\mathrm{loc}$, cela signifie qu'elle peut présenter des singularités ou des discontinuités, donc $P(k)(u_{\mathrm{Ansatz}})$ contient des termes singuliers, ce qui empêche l’application directe des estimations de la résolvante.} {\color{black} Comment ces problèmes sont-ils résolus l'article de Morawetz et Ludwig ?} {\color{black} Quel résultat peut-on espérer pour l'erreur lorsqu'on s'en tient à l'Ansatz de l'optique géométrique ?} % {\color{blue}On peut espérer une erreur de l’ordre $O(k^{-1})$ dans les zones régulières (loin des transitions), mais pas une approximation uniforme sur tout le domaine, en particulier près de la frontière lumière/ombre.}
+    De plus, elle n'est pas dans $H^1_\mathrm{loc}(\Omega^+)$.} {\color{blue}En effet, l’Ansatz présente un saut non nul sur la frontière lumière/ombre, ce qui empêche son appartenance à $H^1_\mathrm{loc}$.} {\color{black}Pourquoi ceci pose-t-il une difficulté pour la stratégie schématisée ci-dessus ?} {\color{blue}La stratégie repose sur l’écriture $$u-u_{\mathrm{Ansatz}} = R(k)P(k)(u-u_{\mathrm{Ansatz}}),$$ qui nécessite un résidu régulier. Or, comme la solution de l'optique géométrique n'est pas dans $H^1_\mathrm{loc}$, cela signifie qu'elle peut présenter des singularités ou des discontinuités, donc $P(k)(u_{\mathrm{Ansatz}})$ contient des termes singuliers, ce qui empêche l’application directe des estimations de la résolvante.} {\color{black} Comment ces problèmes sont-ils résolus l'article de Morawetz et Ludwig ?} {\color{black} Quel résultat peut-on espérer pour l'erreur lorsqu'on s'en tient à l'Ansatz de l'optique géométrique ?} % {\color{blue}On peut espérer une erreur de l’ordre $O(k^{-1})$ dans les zones régulières (loin des transitions), mais pas une approximation uniforme sur tout le domaine, en particulier près de la frontière lumière/ombre.}
     
     \item {\color{black} Dans quelle zone l'erreur est-elle la plus grande ?} {\color{blue}L’erreur est maximale près de la frontière lumière/ombre et dans la zone d’ombre, où l’optique géométrique ne prend pas en compte les phénomènes de diffraction et de rayons rampants.} {\color{black} Y a-t-il des zones où l'erreur semble converger vers $0$ quand $k \to \infty$ ?} {\color{blue}Oui, dans les zones éclairées, loin des régions de transition, où l’optique géométrique décrit correctement la propagation des rayons.} {\color{black} À quelle vitesse ?} % {\color{blue}Typiquement à vitesse $O(k^{-1})$ dans ces zones, en lien avec un résidu en $O(k^{-2})$ et $\rho(k)=O(k)$.} 
     {\color{black} Peut-on expliquer informellement ce comportement ?} {\color{blue}À haute fréquence, la propagation est bien décrite par les rayons géométriques en zone éclairée, ce qui rend l’approximation précise. En revanche, près de la frontière d’ombre, des effets de la diffraction dominent et ne sont pas capturés par l’optique géométrique, ce qui explique une erreur plus importante.}
