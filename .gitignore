@@ -5,6 +5,7 @@ TP.pdf
 __pycache__
 FreeFEM-documentation.pdf
 .DS_Store
+data/*
 
 #tex
 main.aux
