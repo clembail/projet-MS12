@@ -53,45 +53,37 @@ for distance in distances:
   S_total.extend(S_rayon)
   A_total.extend(A_rayon)
 
+# maillage grossier
 # Th = tri.Triangulation(X_total, Y_total)
 
-# 1. On laisse Delaunay faire son maillage brut (avec les mauvais triangles)
+# maillage fancy
 Th_brut = tri.Triangulation(X_total, Y_total)
 
-# 2. On calcule les coordonnées (x,y) du centre de chaque triangle
 triangles = Th_brut.triangles
 x_centers = np.mean(Th_brut.x[triangles], axis=1)
 y_centers = np.mean(Th_brut.y[triangles], axis=1)
 
-# 3. On crée nos masques géométriques
-# Condition A : Le centre doit être hors du cercle
-hors_cercle = (x_centers**2 + y_centers**2) >= 0.99
 
-# Condition B : Le centre doit être hors de la zone d'ombre (le couloir derrière l'obstacle)
-# L'ombre est la zone où x > 0 et y est entre -0.99 et 0.99
+hors_cercle = (x_centers**2 + y_centers**2) >= 0.99
 hors_ombre = ~((x_centers > 0) & (np.abs(y_centers) < 0.99))
 
-# On garde uniquement les triangles qui respectent les DEUX conditions
 valides = hors_cercle & hors_ombre
-
-# 4. On extrait uniquement les triangles valides
 triangles_propres = triangles[valides]
 
-# 5. On recrée l'objet Triangulation, mais cette fois propre et orienté correctement !
 Th = tri.Triangulation(X_total, Y_total, triangles=triangles_propres)
 
-# Sauvegarde habituelle
-pyff.savemesh(Th, "exo/data/mesh.msh")
-pyff.savevector(np.array(S_total), "exo/data/S.txt")
-pyff.savevector(np.array(A_total), "exo/data/A.txt")
+# Sauvegarde 
+pyff.savemesh(Th, "./data/mesh.msh")
+pyff.savevector(np.array(S_total), "./data/S.txt")
+pyff.savevector(np.array(A_total), "./data/A.txt")
 
-pyff.savemesh(Th, "exo/data/mesh.msh")
-pyff.savevector(np.array(S_total), "exo/data/S.txt")
-pyff.savevector(np.array(A_total), "exo/data/A.txt")
+pyff.savemesh(Th, "./data/mesh.msh")
+pyff.savevector(np.array(S_total), "./data/S.txt")
+pyff.savevector(np.array(A_total), "./data/A.txt")
 
 plt.figure(figsize=(10, 8))
 
-# tracé q1 et q2
+# Tracé q1 et q2
 contour = plt.tricontourf(Th, S_total, levels=50, cmap='viridis')
 plt.colorbar(contour, label='Phase S (Chemin optique)')
 
