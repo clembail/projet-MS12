@@ -116,7 +116,7 @@ for i in range(nb_rayons):
 plt.gca().set_aspect('equal', adjustable='box')
 plt.xlim(-2, 2)
 plt.ylim(-2, 2)
-plt.title("Optique géométrique : Rayons et Phase S")
+# plt.title("Optique géométrique : Rayons et Phase S")
 plt.xlabel("x")
 plt.ylabel("y")
 plt.show()

@@ -1,0 +1,23 @@
+\begin{tikzpicture}
+\begin{loglogaxis}[
+    xlabel={$k$},
+    ylabel={},
+    xtick={12.5664, 18.8496, 25.1327, 31.4159, 37.6991},
+    xticklabels={$4\pi$, $6\pi$, $8\pi$, $10\pi$, $12\pi$},
+    grid=major,
+    height=6cm,
+    width=8cm,
+    legend entries={Erreur en norme $L^2$, Erreur relative en norme $L^2$},
+    legend style={
+        at={(0.03,1.03)},
+        anchor=south west
+    },
+]
+    \pgfplotstableread{data/erreur.dat}
+        \datatable
+    
+    \addplot table[y = errL2] from \datatable;
+    \addplot table[y = errrelL2] from \datatable;
+
+\end{loglogaxis}
+\end{tikzpicture} 

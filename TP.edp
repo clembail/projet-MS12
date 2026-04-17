@@ -1,18 +1,18 @@
 load "Element_P4"
 
 // Import python
-mesh Th1 = readmesh("./data/mesh.msh");
+mesh Th1 = readmesh("data/mesh.msh");
 plot(Th1, wait=true, cmm="Maillage Python");
 fespace Vh1(Th1, P1);
 Vh1 S;
-ifstream fileUh("./data/S.txt");
+ifstream fileUh("data/S.txt");
 fileUh >> S[];
 Vh1 A;
-ifstream fileA("./data/A.txt");
+ifstream fileA("data/A.txt");
 fileA >> A[];
 
 // Paramètres
-real k = 4*pi;
+real k = 10*pi;
 real a = 3.0;
 real R = 1;
 
