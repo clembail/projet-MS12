@@ -65,7 +65,7 @@ La figure \ref{fig:rayons} présente la solution $S$ de l'équation eikonale et 
 
 \noindent Dans la suite, on se concentre sur l'obstacle en forme de disque. \\
 
-La calcul des rayons est utilisé pour évaluer les quantités géométriques nécessaires à l'approximation de l'optique géométrique en des points particuliers le long de ces rayons. L’idée est ensuite de créer un maillage dont les sommets sont les points d'échantillonnage des rayons. Ce maillage (figure \ref{fig:maillage_OG_python}) est ensuite importé dans FreeFem++ pour construire l'approximation d'optique géométrique et la comparer à une solution de référence calculée par éléments finis avec PML.
+La calcul des rayons est utilisé pour évaluer les quantités géométriques nécessaires à l'approximation de l'optique géométrique en des points particuliers le long de ces rayons. L’idée est ensuite de créer un maillage dont les sommets sont les points d'échantillonnage des rayons. Ce maillage (figure \ref{fig:maillage_OG_python}) est ensuite importé dans FreeFem++ pour construire l'approximation de l'optique géométrique et la comparer à une solution de référence calculée par éléments finis avec PML.
 
 Le maillage utilisé pour calculer la solution de référence est construit avec un pas de discrétisation 
 $$\boxed{h = \frac{\pi}{2k}}$$
@@ -91,7 +91,7 @@ pour garantir une bonne résolution de la solution, notamment à haute fréquenc
 
 \subsection{Tracé de la partie réelle de la solution des équations de l'optique géométrique}
 
-La figure \ref{fig:partie_reelle_OG} présente la partie réelle de la solution des équations de l'optique géométrique pour différentes fréquences $k$. On observe que l'approximation de l'optique géométrique est bonne dans les zones éclairées, mais elle ne permet pas de modéliser correctement la zone d'ombre où l'ansatz de l'optique géométrique devient faux; il coupe artificiellement le champ, néglige les phénomènes de diffraction et ne prend pas en compte les rayons rampants. De plus, on observe que pour $k = 12 \pi$, la qualité de la solution se dégrade par rapport à des fréquences plus basses. 
+La figure \ref{fig:partie_reelle_OG} présente la partie réelle de la solution des équations de l'optique géométrique pour différentes fréquences $k$. On observe que l'approximation de l'optique géométrique est bonne dans les zones éclairées, mais elle ne permet pas de modéliser correctement la zone d'ombre où l'Ansatz de l'optique géométrique devient faux; il coupe artificiellement le champ, néglige les phénomènes de diffraction et ne prend pas en compte les rayons rampants. De plus, on observe que pour $k = 12 \pi$, la qualité de la solution se dégrade par rapport à des fréquences plus basses. 
 
 \begin{figure}[H]
     \centering
@@ -152,7 +152,7 @@ On remarque que la solution de référence est très similaire à l'approximatio
 La figure \ref{fig:erreur} présente la valeur absolue de la différence entre les solutions de l'optique géométrique et de référence calculée par éléments finis avec PML pour différentes fréquences $k$. On observe plusieurs zones d'erreur : 
 \begin{itemize}
     \item Tout d'abord, l'erreur est très faible dans les zones éclairées, ce qui confirme que l'approximation de l'optique géométrique est bonne dans ces zones. 
-    \item En revanche, l'erreur est très forte près de la frontière lumière/ombre, ce qui confirme que l'ansatz de l'optique géométrique devient faux dans cette zone. À mesure que la fréquence augmente, on observe également une augmentation de l'erreur au niveau de la zone d'impact à gauche de l'obstacle. 
+    \item En revanche, l'erreur est très forte près de la frontière lumière/ombre, ce qui confirme que l'Ansatz de l'optique géométrique devient faux dans cette zone. À mesure que la fréquence augmente, on observe également une augmentation de l'erreur au niveau de la zone d'impact à gauche de l'obstacle. 
     \item Enfin, on observe que dans l'ensemble, l'erreur augmente avec la fréquence $k$, ce qui est cohérent avec la théorie du problème de Helmholtz à haute fréquence, notamment en raison de l'effet de pollution.
 \end{itemize}
 
