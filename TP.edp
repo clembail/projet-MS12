@@ -118,7 +118,7 @@ real normL2 = sqrt(int2d(ThPhys)( abs(uPhys)^2 ));
 real errRelative = errL2 / normL2;
 
 cout << "\n=======================================================" << endl;
-cout << " ANALYSE D'ERREUR POUR k = " << k << " (ATTENDU 2 DU PROJET)" << endl;
+cout << " ANALYSE D'ERREUR POUR k = " << k << endl;
 cout << "=======================================================" << endl;
 cout << " Erreur absolue L2 (domaine physique) : " << errL2 << endl;
 cout << " Erreur relative L2 : " << errRelative << endl;
