@@ -1,6 +1,6 @@
 load "Element_P4"
 
-// Import python
+// import python
 mesh Th1 = readmesh("data/mesh.msh");
 plot(Th1, wait=true, cmm="Maillage Python");
 fespace Vh1(Th1, P1);
@@ -11,21 +11,21 @@ Vh1 A;
 ifstream fileA("data/A.txt");
 fileA >> A[];
 
-// Paramètres
+// paramètres
 real k = 2*pi;
 real a = 3.0;
 real R = 1;
 
-// Frontière objet
+// frontière objet
 border C(t=0, 2*pi){x=R*cos(t); y=R*sin(t); label=1; }
 
-// Frontière extérieure
+// frontière extérieure
 border sq1(t=0, 1){x=-a+2*a*t; y=-a      ; label=2; }
 border sq2(t=0, 1){x=a       ; y=-a+2*a*t; label=2; }
 border sq3(t=0, 1){x=a-2*a*t ; y=a       ; label=2; }
 border sq4(t=0, 1){x=-a      ; y=a-2*a*t ; label=2; }
 
-// Maillage
+// maillage
 real lambda = 2*pi/k;
 real h      = lambda/4;
 int nC      = int(2*pi*R/h);     
@@ -106,7 +106,7 @@ int nCErr = int(2*pi*R / hErr);
 
 mesh ThPhys = buildmesh(physBound(nPhys) + C(-nCErr));
 
-// élément P1 pour calculer l'erreur
+// éléments P1 pour calculer l'erreur
 fespace VhPhys(ThPhys, P1);
 
 VhPhys<complex> uPhys = u; 
